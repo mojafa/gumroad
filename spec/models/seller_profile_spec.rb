@@ -9,7 +9,7 @@ describe SellerProfile do
     it "has CSS for background color, accent color, and font" do
       expect(subject.custom_styles).to include("--accent: 0 154 73;--contrast-accent: 255 255 255")
       expect(subject.custom_styles).to include("--filled: 0 0 0")
-      expect(subject.custom_styles).to include("--body-bg: #000000")
+      expect(subject.custom_styles).to include("--body-bg: #000")
       expect(subject.custom_styles).to include("--color: 255 255 255")
       expect(subject.custom_styles).to include("--font-family: \"Roboto Mono\", \"ABC Favorit\", monospace")
     end

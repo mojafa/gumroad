@@ -58,7 +58,12 @@ describe ProfilePresenter do
         {
           **sections_presenter.props(request:, pundit_user:, seller_custom_domain_url: nil),
           bio: "Bio",
-          tabs: tabs.map { | tab| { **tab, sections: tab[:sections].map { ObfuscateIds.encrypt(_1) } } }
+          tabs: tabs.map { | tab| { **tab, sections: tab[:sections].map { ObfuscateIds.encrypt(_1) } } },
+          profile_settings: {
+            background_color: "#ffffff",
+            highlight_color: "#ff90e8",
+            font: "ABC Favorit",
+          },
         }
       )
     end
@@ -74,6 +79,7 @@ describe ProfilePresenter do
       Link.import(force: true, refresh: true)
       expect(presenter.profile_settings_props(request:)).to match(
         {
+          **described_class.new(pundit_user: SellerContext.logged_out, seller:).profile_props(request:, seller_custom_domain_url: nil),
           profile_settings: {
             name: seller.name,
             username: seller.username,
@@ -84,7 +90,6 @@ describe ProfilePresenter do
             profile_picture_blob_id: nil,
           },
           memberships: [ProductPresenter.card_for_web(product: membership_product, show_seller: false)],
-          **described_class.new(pundit_user: SellerContext.logged_out, seller:).profile_props(request:, seller_custom_domain_url: nil),
         }
       )
     end
