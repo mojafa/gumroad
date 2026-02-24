@@ -6,22 +6,64 @@
   @return red($color) green($color) blue($color);
 }
 
+$creator-bg: <%= background_color %>;
+$creator-accent: <%= highlight_color %>;
+$creator-bg-is-light: lightness($creator-bg) >= 55%;
+$creator-bg-should-darken: lightness($creator-bg) >= 45;
+$dark-mode-bg: if($creator-bg-should-darken, darken($creator-bg, 35%), $creator-bg);
+
 :root {
-  --accent: #{split-color(<%= highlight_color %>)};
-  --contrast-accent: #{split-color(if(lightness(<%= highlight_color %>) < 55%, #fff, #000))};
+  --accent: #{split-color($creator-accent)};
+  --contrast-accent: #{split-color(if(lightness($creator-accent) < 55%, #fff, #000))};
   --font-family: <%= font_family %>;
-  --color: #{split-color(if(lightness(<%= background_color %>) < 55%, #fff, #000))};
-    --primary: var(--color);
-  --contrast-primary: #{split-color(if(lightness(<%= background_color %>) < 55%, #000, #fff))};
-  --filled: #{split-color(<%= background_color %>)};
+  --color: #{split-color(if($creator-bg-is-light, #000, #fff))};
+  --primary: var(--color);
+  --contrast-primary: #{split-color(if($creator-bg-is-light, #fff, #000))};
+  --filled: #{split-color($creator-bg)};
   --contrast-filled: var(--color);
-  --body-bg: <%= background_color %>;
+  --body-bg: #{$creator-bg};
   --active-bg: rgb(var(--color) / var(--gray-1));
   --border-alpha: 1;
 }
 
 body {
-  background-color: <%= background_color %>;
-  color: #{if(lightness(<%= background_color %>) < 55%, #fff, #000)};
+  background-color: $creator-bg;
+  color: #{if($creator-bg-is-light, #000, #fff)};
   font-family: <%= font_family %>;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color: #{split-color(if($creator-bg-is-light, #000, #fff))};
+    --primary: var(--color);
+    --contrast-primary: #{split-color(if($creator-bg-is-light, #fff, #000))};
+    --filled: #{split-color($creator-bg)};
+    --contrast-filled: var(--color);
+    --body-bg: #{$creator-bg};
+    --border-alpha: 1;
+  }
+
+  body {
+    background-color: $creator-bg;
+    color: #{if($creator-bg-is-light, #000, #fff)};
+    font-family: <%= font_family %>;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color: 255 255 255;
+    --primary: var(--color);
+    --contrast-primary: #{split-color($dark-mode-bg)};
+    --filled: #{split-color($dark-mode-bg)};
+    --contrast-filled: var(--color);
+    --body-bg: #{$dark-mode-bg};
+    --border-alpha: 0.35;
+  }
+
+  body {
+    background-color: $dark-mode-bg;
+    color: #fff;
+    font-family: <%= font_family %>;
+  }
 }

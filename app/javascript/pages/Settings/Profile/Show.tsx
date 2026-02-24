@@ -89,6 +89,36 @@ export default function SettingsPage() {
 
   const subdomain = `${profileSettings.username}.${rootDomain}`;
 
+  // Preview shows exact chosen colors - creator sees what they're configuring.
+  // Live page (ProfileThemeProvider) adapts for visitors' dark/light mode.
+  const previewTheme = React.useMemo(() => {
+    const bg = profileSettings.background_color;
+    const color = getContrastColor(bg);
+    return {
+      "--accent": hexToRgb(profileSettings.highlight_color),
+      "--contrast-accent": hexToRgb(getContrastColor(profileSettings.highlight_color)),
+      "--filled": hexToRgb(bg),
+      "--color": hexToRgb(color),
+      "--primary": "var(--color)",
+      "--body-bg": `rgb(${hexToRgb(bg)})`,
+      "--contrast-primary": hexToRgb(bg),
+      "--contrast-filled": hexToRgb(color),
+      "--border-alpha": "1",
+      "--color-body": `rgb(${hexToRgb(bg)})`,
+      "--color-background": `rgb(${hexToRgb(bg)})`,
+      "--color-foreground": `rgb(${hexToRgb(color)})`,
+      "--color-border": `rgb(${hexToRgb(color)} / 1)`,
+      "--color-accent": `rgb(${hexToRgb(profileSettings.highlight_color)})`,
+      "--color-accent-foreground": `rgb(${hexToRgb(getContrastColor(profileSettings.highlight_color))})`,
+      "--color-primary": "rgb(var(--primary))",
+      "--color-primary-foreground": `rgb(${hexToRgb(bg)})`,
+      "--color-active-bg": `rgb(${hexToRgb(color)} / var(--gray-1))`,
+      "--color-muted": `rgb(${hexToRgb(color)} / var(--gray-3))`,
+      backgroundColor: `rgb(${hexToRgb(bg)})`,
+      color: `rgb(${hexToRgb(color)})`,
+    } as React.CSSProperties;
+  }, [profileSettings.background_color, profileSettings.highlight_color]);
+
   return (
     <SettingsLayout currentPage="profile" pages={settings_pages} onSave={handleSave} canUpdate={canUpdate}>
       <Head>
@@ -257,32 +287,14 @@ export default function SettingsPage() {
             style={{
               border: "var(--border)",
               fontFamily: profileSettings.font === "ABC Favorit" ? undefined : profileSettings.font,
-              "--accent": hexToRgb(profileSettings.highlight_color),
-              "--contrast-accent": hexToRgb(getContrastColor(profileSettings.highlight_color)),
-              "--filled": hexToRgb(profileSettings.background_color),
-              "--color": hexToRgb(getContrastColor(profileSettings.background_color)),
-              "--primary": "var(--color)",
-              "--body-bg": "rgb(var(--filled))",
-              "--contrast-primary": "var(--filled)",
-              "--contrast-filled": "var(--color)",
-              "--color-body": "var(--body-bg)",
-              "--color-background": "rgb(var(--filled))",
-              "--color-foreground": "rgb(var(--color))",
-              "--color-border": "rgb(var(--color) / var(--border-alpha))",
-              "--color-accent": "rgb(var(--accent))",
-              "--color-accent-foreground": "rgb(var(--contrast-accent))",
-              "--color-primary": "rgb(var(--primary))",
-              "--color-primary-foreground": "rgb(var(--contrast-primary))",
-              "--color-active-bg": "rgb(var(--color) / var(--gray-1))",
-              "--color-muted": "rgb(var(--color) / var(--gray-3))",
-              backgroundColor: "rgb(var(--filled))",
-              color: "rgb(var(--color))",
+              ...previewTheme,
             }}
           >
             <Profile
               creator_profile={creatorProfile}
               {...(() => ({ profile_settings, settings_pages, ...profileProps }))()}
               bio={profileSettings.bio}
+              skip_theme_provider
             />
           </Preview>
         </PreviewSidebar>

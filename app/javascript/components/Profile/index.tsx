@@ -7,6 +7,7 @@ import AutoLink from "$app/components/AutoLink";
 import { EditProfile, Props as EditProps } from "$app/components/Profile/EditPage";
 import { FollowUserFormBlock } from "$app/components/Profile/FollowUserForm";
 import { Layout } from "$app/components/Profile/Layout";
+import { ProfileThemeProvider } from "$app/components/Profile/ProfileThemeProvider";
 import { PageProps as SectionsProps, Section, SectionLayout } from "$app/components/Profile/Sections";
 import { Tabs as UITabs, Tab as UITab } from "$app/components/ui/Tabs";
 import { useOriginalLocation } from "$app/components/useOriginalLocation";
@@ -15,6 +16,13 @@ import { useRefToLatest } from "$app/components/useRefToLatest";
 export type ProfileProps = {
   tabs: Tab[];
   bio: string | null;
+  profile_settings?: {
+    background_color: string;
+    highlight_color: string;
+    font?: string;
+  };
+  /** When true, theme is applied by parent (e.g. Preview) - skip ProfileThemeProvider */
+  skip_theme_provider?: boolean;
 };
 
 export type Props = SectionsProps & ProfileProps;
@@ -92,8 +100,22 @@ const PublicProfile = (props: Props) => {
   );
 };
 
-export const Profile = (props: Props | EditProps) => (
-  <Layout creatorProfile={props.creator_profile} hideFollowForm={!props.sections.length}>
-    {"products" in props ? <EditProfile {...props} /> : <PublicProfile {...props} />}
-  </Layout>
-);
+export const Profile = (props: Props | EditProps) => {
+  const content = (
+    <Layout creatorProfile={props.creator_profile} hideFollowForm={!props.sections.length}>
+      {"products" in props ? <EditProfile {...props} /> : <PublicProfile {...props} />}
+    </Layout>
+  );
+
+  const profileSettings = "profile_settings" in props ? props.profile_settings : null;
+  const skipThemeProvider = "skip_theme_provider" in props && props.skip_theme_provider;
+  if (profileSettings?.background_color && profileSettings?.highlight_color && !skipThemeProvider) {
+    return (
+      <ProfileThemeProvider profileSettings={profileSettings}>
+        {content}
+      </ProfileThemeProvider>
+    );
+  }
+
+  return content;
+};

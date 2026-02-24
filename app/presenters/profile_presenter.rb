@@ -51,6 +51,11 @@ class ProfilePresenter
         bio: seller.bio,
         tabs: (seller.seller_profile.json_data["tabs"] || [])
                 .map { |tab| { name: tab["name"], sections: tab["sections"].map { ObfuscateIds.encrypt(_1) } } },
+        profile_settings: {
+          background_color: seller.seller_profile.background_color,
+          highlight_color: seller.seller_profile.highlight_color,
+          font: seller.seller_profile.font,
+        },
       }
     end
 

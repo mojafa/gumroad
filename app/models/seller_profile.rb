@@ -47,7 +47,7 @@ class SellerProfile < ApplicationRecord
   end
 
   def custom_style_cache_name
-    "users/#{seller.id}/custom_styles_v2"
+    "users/#{seller.id}/custom_styles_v5"
   end
 
   def validate_json_data
